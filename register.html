@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-firestore.js"></script>
+  
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2 class="text-center">Register</h2>
+    <form id="register-form">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="isAdmin">Admin?</label>
+        <input type="checkbox" id="isAdmin">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Register</button>
+    </form>
+    <p class="text-center">Already have an account? <a href="login.html">Login here</a></p>
+  </div>
+
+  <script>
+    // Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyC6q-jTNQxXOPCaZczcpgRk4q8ftQ0-n3c",
+      authDomain: "internet-14942.firebaseapp.com",
+      projectId: "internet-14942",
+      storageBucket: "internet-14942.appspot.com",
+      messagingSenderId: "214259914034",
+      appId: "1:214259914034:web:de404cf9ee7b35b41b732b",
+      measurementId: "G-BX35S5MZJY"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Handle user registration
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const isAdmin = document.getElementById('isAdmin').checked;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(function(userCredential) {
+          var user = userCredential.user;
+
+          // Add user data to Firestore
+          db.collection('users').doc(user.uid).set({
+            email: user.email,
+            isAdmin: isAdmin
+          }).then(function() {
+            alert("Registration successful!");
+            window.location.href = "index.html"; // Redirect to login page after registration
+          }).catch(function(error) {
+            alert("Error: " + error.message);
+          });
+        })
+        .catch(function(error) {
+          alert("Error: " + error.message);
+        });
+    });
+  </script>
+</body>
+</html>
